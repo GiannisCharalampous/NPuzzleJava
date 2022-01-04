@@ -1,22 +1,38 @@
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
 
-class Tree_node {
+class Tree_node implements Comparable<Tree_node> {
 	Tree_node parent;
 	LinkedList<Tree_node> children = new LinkedList<Tree_node>();
 	int puzzle[][];
 	int x;
 	int y;
 	String move;
+	int g;
+	int h;
 
-	public Tree_node(int puzzle[][], int x, int y, String move, Tree_node parent) {
+	public Tree_node(int puzzle[][], int x, int y, String move, Tree_node parent, int g, int h) {
 		this.puzzle = puzzle;
 		this.x = x;
 		this.y = y;
 		this.move = move;
 		this.parent = parent;
+		this.g = g;
+		this.h = h;
 	}
+
+	@Override
+	public int compareTo(Tree_node node) {
+		if (this.h == node.h)
+			return 0;
+		else if (this.h > node.h)
+			return 1;
+		else
+			return -1;
+	}
+
 }
 
 public class NPuzzle {
@@ -25,15 +41,15 @@ public class NPuzzle {
 		// Scanner sc = new Scanner(System.in);
 		// Integer n = sc.nextInt();
 		// int puzzle[][] = new int[n][n];
-		int puzzle[][] = new int[][] { { 4, 1, 3 }, { 2, 0, 6 }, { 7, 5, 8 } }; // n = 3
+		int puzzle[][] = new int[][] { { 8, 1, 5 }, { 7, 0, 3 }, { 4, 2, 6 } }; // n = 3
 
 		BFS(puzzle, 1, 1);
 	}
 
 	private static void BFS(int[][] puzzle, int x, int y) {
-		Queue<Tree_node> queue = new LinkedList<Tree_node>();
-
-		Tree_node root = new Tree_node(puzzle, x, y, "", null);
+		// Queue<Tree_node> queue = new LinkedList<Tree_node>();
+		PriorityQueue<Tree_node> queue = new PriorityQueue<Tree_node>();
+		Tree_node root = new Tree_node(puzzle, x, y, "", null, 0, calcManhattan(puzzle));
 		queue.add(root);
 		LinkedList<Tree_node> children = new LinkedList<Tree_node>();
 		Tree_node curr = null;
@@ -84,6 +100,23 @@ public class NPuzzle {
 
 	}
 
+	private static int calcManhattan(int[][] puzzle) {
+
+		int h = 0;
+
+		int num = 1;
+		for (int i = 0; i < puzzle.length; i++) {
+			for (int j = 0; j < puzzle.length; j++) {
+				if (num == puzzle[i][j]) {
+					h += Math.abs(i - (num - 1) / 3) + Math.abs(j - (num - 1) % 3);
+					num++;
+				}
+			}
+		}
+
+		return h;
+	}
+
 	private static void createChild(int[][] puzzle, Queue<Tree_node> queue, LinkedList<Tree_node> children,
 			Tree_node curr, String move, int new_x, int new_y) {
 		int[][] temp_puzzle = new int[puzzle.length][puzzle.length];
@@ -94,12 +127,28 @@ public class NPuzzle {
 		temp_puzzle[curr.x][curr.y] = puzzle[new_x][new_y];
 		temp_puzzle[new_x][new_y] = 0;
 
-		Tree_node child = new Tree_node(temp_puzzle, new_x, new_y, move, curr);
+		int solution[][] = new int[][] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 0 } };
+		int new_h = 0;
+		boolean flag = false;
+		for (int i = 0; i < puzzle.length; i++) {
+			for (int j = 0; j < puzzle.length; j++) {
+				if (temp_puzzle[curr.x][curr.y] == solution[i][j]) {
+					new_h = curr.h + Math.abs(i - curr.x) + Math.abs(j - curr.y);
+					flag = true;
+					break;
+				}
+				if (flag)
+					break;
+			}
+		}
+
+		Tree_node child = new Tree_node(temp_puzzle, new_x, new_y, move, curr, curr.g + 1, new_h);
 		// check for equals
 		if (!equalsObj(child)) {
 			queue.add(child);
 			children.add(child);
 		}
+
 	}
 
 	private static boolean equalsObj(Tree_node child) {
