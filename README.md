@@ -4,7 +4,11 @@
 * [Technologies](#technologies)
 
 ## General info
-This project is simple N Puzzle game solver
+This project is simple N Puzzle game solver. 
+Graph-based search algorithm: BFS (Breadth-first Search), A* Search (Manhattan Distance)
+
+
+
 	
 ## Technologies
 Project is created with:
