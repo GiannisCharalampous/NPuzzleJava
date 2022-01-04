@@ -5,7 +5,10 @@
 
 ## General info
 This project is simple N Puzzle game solver. 
-Graph-based search algorithm: BFS (Breadth-first Search), A* Search (Manhattan Distance)
+
+Graph-based search algorithms were used: 
+	- BFS (Breadth-first Search) 
+	- A* Search (Manhattan Distance)
 
 
 
